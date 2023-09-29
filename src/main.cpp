@@ -24,13 +24,9 @@ WiFiServer server(80);
 Stepper myStepper(2048, IN1, IN3, IN2, IN4);
 Stepper myStepper2(2048, IN5, IN6, IN7, IN8);
 
-// Variables to store the current position of each motor
-long currentPosition1 = 0;
-long currentPosition2 = 0;
-
-// Variable to store the target position for each motor
-long targetPosition1 = 0;
-long targetPosition2 = 0;
+// Motor speeds for forward and backward movement
+int motorSpeedForward = 100; // Adjust as needed
+int motorSpeedBackward = -100; // Adjust as needed
 
 void setup() {
   Serial.begin(115200);
@@ -51,9 +47,9 @@ void setup() {
   Serial.println(WiFi.localIP());
   server.begin();
 
-  // Set the speed at 5 rpm
-  myStepper.setSpeed(5);
-  myStepper2.setSpeed(5);
+  // Set the initial speed of the motors
+  myStepper.setSpeed(0);
+  myStepper2.setSpeed(0);
 }
 
 void loop() {
@@ -75,24 +71,26 @@ void loop() {
             client.println("Connection: close");
             client.println();
 
-            if (currentPosition1 < targetPosition1) {
-              Serial.println("Left on");
-              myStepper.step(1);
-              currentPosition1++;
-            } else if (currentPosition1 > targetPosition1) {
-              Serial.println("Left off");
-              myStepper.step(-1);
-              currentPosition1--;
-            }
-
-            if (currentPosition2 < targetPosition2) {
-              Serial.println("Right on");
-              myStepper2.step(1);
-              currentPosition2++;
-            } else if (currentPosition2 > targetPosition2) {
-              Serial.println("Right off");
-              myStepper2.step(-1);
-              currentPosition2--;
+            if (currentLine.indexOf("Forward") != -1) {
+              Serial.println("Forward");
+              myStepper.setSpeed(motorSpeedForward);
+              myStepper2.setSpeed(motorSpeedForward);
+            } else if (currentLine.indexOf("Backward") != -1) {
+              Serial.println("Backward");
+              myStepper.setSpeed(motorSpeedBackward);
+              myStepper2.setSpeed(motorSpeedBackward);
+            } else if (currentLine.indexOf("Left") != -1) {
+              Serial.println("Left");
+              myStepper.setSpeed(motorSpeedBackward);
+              myStepper2.setSpeed(motorSpeedForward);
+            } else if (currentLine.indexOf("Right") != -1) {
+              Serial.println("Right");
+              myStepper.setSpeed(motorSpeedForward);
+              myStepper2.setSpeed(motorSpeedBackward);
+            } else if (currentLine.indexOf("Stop") != -1) {
+              Serial.println("Stop");
+              myStepper.setSpeed(0);
+              myStepper2.setSpeed(0);
             }
 
             // HTML response
@@ -104,19 +102,12 @@ void loop() {
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
             client.println(".button2 {background-color: #555555;}</style></head>");
 
-            client.println("<body><h1>ESP32 Web Server</h1>");
-            client.println("<p>Left - Position " + String(currentPosition1) + "</p>");
-            client.println("<p><a href=\"/LeftOn\"><button class=\"button\">ON</button></a></p>");
-            client.println("<p><a href=\"/LeftOff\"><button class=\"button button2\">OFF</button></a></p>");
-
-            client.println("<p>Right - Position " + String(currentPosition2) + "</p>");
-            client.println("<p><a href=\"/RightOn\"><button class=\"button\">ON</button></a></p>");
-            client.println("<p><a href=\"/RightOff\"><button class=\"button button2\">OFF</button></a></p>");
-
-            // Button to start both motors simultaneously
-            client.println("<p><a href=\"/BothOn\"><button class=\"button\">Both Motors ON</button></a></p>");
-            client.println("<p><a href=\"/BothOff\"><button class=\"button button2\">Both Motors OFF</button></a></p>");
-
+            client.println("<body><h1>Remote Control Car</h1>");
+            client.println("<p><a href=\"/Forward\"><button class=\"button\">Forward</button></a></p>");
+            client.println("<p><a href=\"/Backward\"><button class=\"button\">Backward</button></a></p>");
+            client.println("<p><a href=\"/Left\"><button class=\"button\">Left</button></a></p>");
+            client.println("<p><a href=\"/Right\"><button class=\"button\">Right</button></a></p>");
+            client.println("<p><a href=\"/Stop\"><button class=\"button button2\">Stop</button></a></p>");
             client.println("</body></html>");
             client.println();
             break;
