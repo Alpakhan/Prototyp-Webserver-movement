@@ -28,6 +28,46 @@ Stepper myStepper2(2048, IN5, IN6, IN7, IN8);
 int motorSpeedForward = 100; // Adjust as needed
 int motorSpeedBackward = -100; // Adjust as needed
 
+// HTML page as a C++ string
+const char* htmlPage = R"=====(
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <style>
+        html {
+            font-family: Helvetica;
+            display: inline-block;
+            margin: 0px auto;
+            text-align: center;
+        }
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 16px 40px;
+            text-decoration: none;
+            font-size: 30px;
+            margin: 2px;
+            cursor: pointer;
+        }
+        .button2 {
+            background-color: #555555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Remote Control Car</h1>
+    <p><a href="/Forward"><button class="button">Forward</button></a></p>
+    <p><a href="/Backward"><button class="button">Backward</button></a></p>
+    <p><a href="/Left"><button class="button">Left</button></a></p>
+    <p><a href="/Right"><button class="button">Right</button></a></p>
+    <p><a href="/Stop"><button class="button button2">Stop</button></a></p>
+</body>
+</html>
+)=====";
+
 void setup() {
   Serial.begin(115200);
 
@@ -70,6 +110,7 @@ void loop() {
             client.println("Content-type:text/html");
             client.println("Connection: close");
             client.println();
+            client.print(htmlPage); // Send the HTML page
 
             if (currentLine.indexOf("Forward") != -1) {
               Serial.println("Forward");
@@ -93,23 +134,6 @@ void loop() {
               myStepper2.setSpeed(0);
             }
 
-            // HTML response
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
-            client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-            client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #555555;}</style></head>");
-
-            client.println("<body><h1>Remote Control Car</h1>");
-            client.println("<p><a href=\"/Forward\"><button class=\"button\">Forward</button></a></p>");
-            client.println("<p><a href=\"/Backward\"><button class=\"button\">Backward</button></a></p>");
-            client.println("<p><a href=\"/Left\"><button class=\"button\">Left</button></a></p>");
-            client.println("<p><a href=\"/Right\"><button class=\"button\">Right</button></a></p>");
-            client.println("<p><a href=\"/Stop\"><button class=\"button button2\">Stop</button></a></p>");
-            client.println("</body></html>");
-            client.println();
             break;
           } else {
             currentLine = "";
