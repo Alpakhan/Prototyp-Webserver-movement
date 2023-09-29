@@ -55,18 +55,40 @@ const char* htmlPage = R"=====(
         .button2 {
             background-color: #555555;
         }
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+        }
+        .arrow-button {
+            background-color: #3498db;
+            border: none;
+            color: white;
+            padding: 16px 40px;
+            text-decoration: none;
+            font-size: 30px;
+            margin: 2px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <h1>Remote Control Car</h1>
-    <p><a href="/Forward"><button class="button">Forward</button></a></p>
-    <p><a href="/Backward"><button class="button">Backward</button></a></p>
-    <p><a href="/Left"><button class="button">Left</button></a></p>
-    <p><a href="/Right"><button class="button">Right</button></a></p>
-    <p><a href="/Stop"><button class="button button2">Stop</button></a></p>
+    <div class="controls">
+        <a href="/Forward"><button class="arrow-button" style="grid-column: 2; grid-row: 1;">&#8593;</button></a>
+        <a href="/Left"><button class="arrow-button" style="grid-column: 1; grid-row: 2;">&#8592;</button></a>
+        <a href="/Right"><button class="arrow-button" style="grid-column: 3; grid-row: 2;">&#8594;</button></a>
+        <a href="/Backward"><button class="arrow-button" style="grid-column: 2; grid-row: 3;">&#8595;</button></a>
+        <a href="/Stop"><button class="arrow-button" style="grid-column: 2; grid-row: 2; background-color: #e74c3c;">&#9632;</button></a>
+    </div>
 </body>
 </html>
 )=====";
+
 
 void setup() {
   Serial.begin(115200);
