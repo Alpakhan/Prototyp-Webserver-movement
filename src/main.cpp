@@ -20,9 +20,12 @@ WiFiServer server(80);
 #define IN7 4
 #define IN8 11
 
-// initialize the stepper library
-Stepper myStepper(2048, IN1, IN3, IN2, IN4);
-Stepper myStepper2(2048, IN5, IN6, IN7, IN8);
+// Define the number of steps per revolution
+const int stepsPerRevolution = 2048; // Change this to fit the number of steps per revolution
+
+// Initialize the stepper library
+Stepper myStepper(stepsPerRevolution, IN1, IN3, IN2, IN4);
+Stepper myStepper2(stepsPerRevolution, IN5, IN6, IN7, IN8);
 
 // Motor speeds for forward and backward movement
 int motorSpeedForward = 100; // Adjust as needed
@@ -57,8 +60,8 @@ const char* htmlPage = R"=====(
         }
         .controls {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             gap: 10px;
             align-items: center;
             justify-content: center;
@@ -79,12 +82,21 @@ const char* htmlPage = R"=====(
 <body>
     <h1>Remote Control Car</h1>
     <div class="controls">
-        <a href="/Forward"><button class="arrow-button" style="grid-column: 2; grid-row: 1;">&#8593;</button></a>
-        <a href="/Left"><button class="arrow-button" style="grid-column: 1; grid-row: 2;">&#8592;</button></a>
-        <a href="/Right"><button class="arrow-button" style="grid-column: 3; grid-row: 2;">&#8594;</button></a>
-        <a href="/Backward"><button class="arrow-button" style="grid-column: 2; grid-row: 3;">&#8595;</button></a>
-        <a href="/Stop"><button class="arrow-button" style="grid-column: 2; grid-row: 2; background-color: #e74c3c;">&#9632;</button></a>
+        <a href="/Forward"><button class="arrow-button" style="grid-column: 2; grid-row: 1;" onclick="sendCommand('/Forward');">&#8593;</button></a>
+        <a href="/Left"><button class="arrow-button" style="grid-column: 1; grid-row: 2;" onclick="sendCommand('/Left');">&#8592;</button></a>
+        <a href="/Right"><button class="arrow-button" style="grid-column: 3; grid-row: 2;" onclick="sendCommand('/Right');">&#8594;</button></a>
+        <a href="/Stop"><button class="arrow-button" style="grid-column: 2; grid-row: 2; background-color: #e74c3c;" onclick="sendCommand('/Stop');">■</button></a>
+        <a href="/Backward"><button class="arrow-button" style="grid-column: 2; grid-row: 3;" onclick="sendCommand('/Backward');">&#8595;</button></a>
     </div>
+
+    <script>
+        function sendCommand(command) {
+            // Send an HTTP request to the ESP32 with the selected command
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", command, true);
+            xhr.send();
+        }
+    </script>
 </body>
 </html>
 )=====";
